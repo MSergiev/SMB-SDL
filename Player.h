@@ -12,8 +12,8 @@ public:
 	void eventHandler();
 	void render();
 	bool isFalling();
-	Block& getFromIndex(int x, int y);
-	void calculateGround();
+	Block& getBlock(int x, int y);
+	//void calculateGround();
 	void blockCollide();
 	~Player();
 
@@ -22,11 +22,12 @@ public:
 	bool jumped;
 	bool scroll;
 	bool mushroom, flower, star;
+	bool run;
 	int starCounter;
 	Texture& mSpriteSheet;
 	int mPosX, mPosY;
 	int mVelX, mVelY;
-	int zero;
+	int oldVelX;
 	SDL_RendererFlip flip;
 };
 

@@ -5,29 +5,22 @@
 #define HEIGHT 600
 #define LHEIGHT 14
 #define LLENGTH 250
+#define BLOCK 16
 #define VEL 2
-#define MAX_VEL 4
-#define ZERO HEIGHT/2-(LHEIGHT*16)/3-10
+#define MAX_VEL 2
+#define ZERO HEIGHT/2-(LHEIGHT*BLOCK)/3-10
 #define FPS 60
 #define TICKS_PER_FRAME 1000/FPS
-#define OFFSET 32
+#define OFFSET BLOCK*2
 #define MLENGTH LLENGTH
 #define MHEIGHT LHEIGHT+4
+#define GRAVITY 9.8
 
 #include <vector>
 
 enum Item
 { 
 	NOTHING, COIN, MUSHROOM, STAR, ONEUP
-};
-
-struct Coords
-{
-	Coords(int x, int y){
-		this->x=x;
-		this->y=y;
-	}
-	int x, y;
 };
 
 struct Block

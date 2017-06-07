@@ -3,10 +3,11 @@
 Player::Player(Texture& mSpriteSheet)
 	:mSpriteSheet(mSpriteSheet)
 {
-	mPosX=30;
-	mPosY=zero;
+	mPosX=OFFSET;
+	mPosY=0;
 	mVelX=0;
 	mVelY=0;
+	oldVelX = 0;
 	accelTimer = SDL_GetTicks();
 	jumpTimer = SDL_GetTicks();
 	scroll = 0;
@@ -14,7 +15,6 @@ Player::Player(Texture& mSpriteSheet)
 	flower = 0;
 	star = 0;
 	starCounter = 0;
-	zero = ZERO-(1+mushroom)*16;
 	flip = SDL_FLIP_NONE;
 }
 
@@ -24,47 +24,55 @@ void Player::eventHandler()
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	
 	if(accelerate){
+		if(state[SDL_SCANCODE_Z]){
+			run = 1;
+		} else {
+			run = 0;
+		}
+		
 		if(state[SDL_SCANCODE_LEFT]){
-			if(accelerate && mVelX>-MAX_VEL) mVelX-=VEL;
+			if(mVelX>-MAX_VEL) mVelX-=(VEL*(1+run));
 			flip = SDL_FLIP_HORIZONTAL;
 		} else {
-			if(mVelX<0)mVelX+=VEL;	
+			if(mVelX<0) mVelX+=VEL;	
 		}
+
 		if(state[SDL_SCANCODE_RIGHT]){
-			if(accelerate && mVelX<MAX_VEL) mVelX+=VEL;
+			if(mVelX<MAX_VEL) mVelX+=(VEL*(1+run));
 			flip = SDL_FLIP_NONE;
 		} else {
-			if(mVelX>0)mVelX-=VEL;
+			if(mVelX>0) mVelX-=VEL;
 		}
 	
-		if(state[SDL_SCANCODE_SPACE] && !isFalling()){
-			if((SDL_GetTicks()-jumpTimer) < 1000 || !jumped){
-				jumped = 1;
-				if(accelerate && mVelY==0) {
-					mVelY-=((abs(mVelX)+1)/4)*VEL+5;
-					jumpTimer = SDL_GetTicks();
-				}
+		if(state[SDL_SCANCODE_X] && !isFalling()){
+			if(mVelY==0) {
+				mVelY-=GRAVITY-(MAX_VEL-mVelX);
 			}
 		} else {
-			jumped = false;
-			if(isFalling()) mVelY+=VEL;
+			mVelY+=VEL;
 		}
+
+		/*if(state[SDL_SCANCODE_DOWN]){
+			if(mVelY<MAX_VEL) mVelY+=VEL;
+		} else {
+			if(mVelY>0) mVelY-=VEL;
+		}
+
+		if(state[SDL_SCANCODE_UP]){
+			if(mVelY>-MAX_VEL) mVelY-=VEL;
+		} else {
+			if(mVelY<0) mVelY+=VEL;
+		}*/
 	}
 
+	blockCollide();
+	
 	mPosX+=mVelX;
 	mPosY+=mVelY; 
 
-	calculateGround();
-	blockCollide();
-
-	if(mPosY>zero) mPosY = zero;
-	if(mPosY<-15) mPosY = -15;
-	//if(!isFalling()) mVelY=0;
-	
-
 	std::cout << "PX:" << mPosX << " PY:" << 
 	mPosY << " VX:" <<  mVelX << " VY:" <<  mVelY << 
-	" Z:" << zero << " GR:" << !isFalling() << std::endl;
+	" GR:" << !isFalling() << std::endl;
 
 	if(accelerate) accelTimer = SDL_GetTicks();
 }
@@ -72,47 +80,40 @@ void Player::eventHandler()
 void Player::render() 
 {
 	SDL_Rect clip;
-	if(isFalling())
-		clip = {4*16, 2*16-2*mushroom*16+3*flower*16+(3*starCounter*16), 16, 16*(1+mushroom)};
+	if(abs(mVelX)<abs(oldVelX) && mVelX!=0)
+	clip = {3*BLOCK, 2*BLOCK-2*mushroom*BLOCK+3*flower*BLOCK+(3*starCounter*BLOCK), BLOCK, BLOCK*(1+mushroom)};
+	else if(isFalling())
+		clip = {4*BLOCK, 2*BLOCK-2*mushroom*BLOCK+3*flower*BLOCK+(3*starCounter*BLOCK), BLOCK, BLOCK*(1+mushroom)};
 	else if(mVelX!=0)
-		clip = {((mPosX/32)%3)*16, 2*16-2*mushroom*16+3*flower*16+(3*starCounter*16), 16, 16*(1+mushroom)};
+		clip = {((mPosX/(BLOCK*2))%3)*BLOCK, 2*BLOCK-2*mushroom*BLOCK+3*flower*BLOCK+(3*starCounter*BLOCK), BLOCK, BLOCK*(1+mushroom)};
 	else
-		clip = {6*16, 2*16-2*mushroom*16+3*flower*16+(3*starCounter*16), 16, 16*(1+mushroom)};
+		clip = {6*BLOCK, 2*BLOCK-2*mushroom*BLOCK+3*flower*BLOCK+(3*starCounter*BLOCK), BLOCK, BLOCK*(1+mushroom)};
 	if(star) starCounter = (starCounter+1)%11;
 
-	mSpriteSheet.render(OFFSET, mPosY, &clip, 0.0f, NULL, flip);
+	mSpriteSheet.render(OFFSET, mPosY-BLOCK+4-mushroom*BLOCK, &clip, 0.0f, NULL, flip);
+	oldVelX = mVelX;
 }
 
 bool Player::isFalling(){
-	return abs(zero-mPosY)>0;
+	return mVelY!=0;
 }
 
-Block& Player::getFromIndex(int x, int y){
-	x/=16; y/=16;
-	if(y<0 || y>(LHEIGHT+2)) y = 0;
-	if(x<0 || x>LLENGTH) x = 0;
-	return layout->at(y+1)[x+1+(OFFSET/16)];
-}
-
-void Player::calculateGround(){
-	//getFromIndex(mPosX, mPosY) = Block(true, true, 0, 0);
-	int tmp = HEIGHT/2;
-	for(int i = mPosY+8; i < (ZERO-MHEIGHT*16); i+=16){
-		if(!getFromIndex(mPosX, i).passThrough){
-			tmp = (i/16);
-			break;
-		}
-	}
-	zero = (tmp*16-8);
-	std::cout << zero << endl;
-	//zero = ZERO-(1+mushroom)*16;
+Block& Player::getBlock(int x, int y){
+	x/=BLOCK; y/=BLOCK;
+	if(y<0 || y>=MHEIGHT) y = 0;
+	if(x<0 || x>=MLENGTH) x = 0;
+	return layout->at(y)[x+(OFFSET/BLOCK)];
 }
 
 void Player::blockCollide(){
-	if(!getFromIndex(mPosX, mPosY).passThrough && mVelX>0) mVelX = 0;
-	if(!getFromIndex(mPosX-16, mPosY).passThrough && mVelX<0) mVelX = 0;
-	if(!getFromIndex(mPosX, mPosY-16).passThrough && mVelY<0) mVelY = 0;
-	if(!getFromIndex(mPosX, mPosY).passThrough && mVelY>0) mVelY = 0;
+//R	
+	if(!getBlock(mPosX+BLOCK, mPosY).passThrough|!getBlock(mPosX+BLOCK, mPosY-BLOCK).passThrough && mVelX>0) mVelX = 0;
+//L
+	if(!getBlock(mPosX, mPosY).passThrough && mVelX<0) mVelX = 0;
+//D	
+	if(!getBlock(mPosX+BLOCK, mPosY+BLOCK).passThrough|!getBlock(mPosX, mPosY+BLOCK).passThrough && mVelY>0) mVelY = 0;
+//U
+	if(!getBlock(mPosX, mPosY-8).passThrough && mVelY<0) mVelY = 0;
 }
 
 Player::~Player(){}
