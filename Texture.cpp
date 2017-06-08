@@ -4,6 +4,7 @@ Texture::Texture(SDL_Renderer* mRenderer)
 {
 	this->mRenderer = mRenderer;
 	mTexture = NULL;
+	mFont = NULL;
 	mWidth = 0;
 	mHeight = 0;
 }
@@ -15,6 +16,7 @@ Texture::~Texture()
 
 bool Texture::loadFromFile(string path) 
 {
+	free();
 	SDL_Texture* tex = NULL;
 	SDL_Surface* loaded = IMG_Load(path.c_str());
 	if(loaded==NULL) cerr << "Texture error: " << IMG_GetError() << endl;
@@ -30,6 +32,20 @@ bool Texture::loadFromFile(string path)
 	}
 	mTexture = tex;
     return mTexture!=NULL;
+}
+
+bool Texture::loadFromRenderedText(string text, SDL_Color color){
+	free();
+	SDL_Surface* textSurface = TTF_RenderText_Solid(mFont, text.c_str(), color);
+	mTexture = SDL_CreateTextureFromSurface(mRenderer, textSurface);
+	if(mTexture==NULL){
+		cerr << "Font texture error: " << TTF_GetError() << endl;
+	} else {
+		mWidth = textSurface->w;
+		mHeight = textSurface->h;
+	}
+	SDL_FreeSurface(textSurface);
+	return mTexture!=NULL;
 }
 
 void Texture::free() 

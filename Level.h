@@ -1,18 +1,13 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include <iostream>
-#include <fstream>
-#include <SDL2/SDL.h>
-#include <pugixml.hpp>
-#include "Texture.h"
 #include "Params.h"
+#include "Texture.h"
 
 class Level
 {
 public:
 	int length, palette, flagpole;
-	//Block map[LHEIGHT+2][LLENGTH];
 	Layout layout;
 	Level(Texture& mTileset);
 	void render(int scroll=0);

@@ -1,10 +1,5 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include "Level.h"
-#include "Player.h"
 #include "Params.h"
-using namespace std;
+#include "Texture.h"
 
 bool init();
 bool loadMedia();
@@ -28,9 +23,10 @@ int main(int argc, char* argv[]){
 		Uint32 timer;
 		gTileset = Texture(gRenderer);
 		gPlayerSprites = Texture(gRenderer);
-		cout << "----" << endl;
-		level.toTXT();
+		//level.toTXT();
 		player.layout = &level.layout;
+		Text hud(gRenderer, &gTileset);
+		hud.showHUD = 1;
 		if(!loadMedia()) cerr << "Tileset loading failed" << endl;
 		else{
 			SDL_RenderSetScale(gRenderer, 2.5, 2.5);
@@ -43,6 +39,7 @@ int main(int argc, char* argv[]){
 				if(avg>2000000) avg = 0;
 				level.render(getScroll());
 				player.render();
+				hud.drawHUD();
 				SDL_RenderPresent(gRenderer);
 				++countedFrames;
 				int frameTicks = SDL_GetTicks()-timer;
@@ -68,7 +65,6 @@ bool init(){
 	   	cerr << "SDL error: " << SDL_GetError() << endl;
 		success = false;
 	} else {
-		//if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) cerr << "Linear filtering not enabled" << endl;
 		gWindow = SDL_CreateWindow("SMB", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
 				WIDTH, HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 		if(gWindow==NULL){

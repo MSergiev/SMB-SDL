@@ -3,7 +3,9 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
+using std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
@@ -14,6 +16,7 @@ public:
 	Texture(SDL_Renderer* mRenderer);
 	~Texture();
 	bool loadFromFile(string path);
+	bool loadFromRenderedText(string text, SDL_Color color);
 	void free();
 	void setColor(Uint8 r, Uint8 g, Uint8 b);
 	void setBlendMode(SDL_BlendMode blending);
@@ -24,6 +27,7 @@ public:
 	
 	SDL_Renderer* mRenderer;
 	SDL_Texture* mTexture;
+	TTF_Font* mFont;
 	int mWidth, mHeight;
 };
 

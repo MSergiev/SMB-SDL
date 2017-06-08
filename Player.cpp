@@ -16,6 +16,7 @@ Player::Player(Texture& mSpriteSheet)
 	star = 0;
 	starCounter = 0;
 	flip = SDL_FLIP_NONE;
+	sound.music(OVERWORLD);
 }
 
 void Player::eventHandler() 
@@ -31,14 +32,14 @@ void Player::eventHandler()
 		}
 		
 		if(state[SDL_SCANCODE_LEFT]){
-			if(mVelX>-MAX_VEL) mVelX-=(VEL*(1+run));
+			if(mVelX>-MAX_VEL) mVelX-=(VEL+run*2);
 			flip = SDL_FLIP_HORIZONTAL;
 		} else {
 			if(mVelX<0) mVelX+=VEL;	
 		}
 
 		if(state[SDL_SCANCODE_RIGHT]){
-			if(mVelX<MAX_VEL) mVelX+=(VEL*(1+run));
+			if(mVelX<MAX_VEL) mVelX+=(VEL+run*2);
 			flip = SDL_FLIP_NONE;
 		} else {
 			if(mVelX>0) mVelX-=VEL;
@@ -47,6 +48,7 @@ void Player::eventHandler()
 		if(state[SDL_SCANCODE_X] && !isFalling()){
 			if(mVelY==0) {
 				mVelY-=GRAVITY-(MAX_VEL-mVelX);
+				sound.play(SJUMPFX);
 			}
 		} else {
 			mVelY+=VEL;
@@ -107,13 +109,25 @@ Block& Player::getBlock(int x, int y){
 
 void Player::blockCollide(){
 //R	
-	if(!getBlock(mPosX+BLOCK, mPosY).passThrough|!getBlock(mPosX+BLOCK, mPosY-BLOCK).passThrough && mVelX>0) mVelX = 0;
+	if(!getBlock(mPosX+BLOCK, mPosY).passThrough|!getBlock(mPosX+BLOCK, mPosY-BLOCK).passThrough && mVelX>0){
+	   	mVelX = 0;
+		sound.play(BUMPFX);
+	}
 //L
-	if(!getBlock(mPosX, mPosY).passThrough && mVelX<0) mVelX = 0;
+	if(!getBlock(mPosX, mPosY).passThrough && mVelX<0){
+		mVelX = 0;
+		sound.play(BUMPFX);
+	}
 //D	
-	if(!getBlock(mPosX+BLOCK, mPosY+BLOCK).passThrough|!getBlock(mPosX, mPosY+BLOCK).passThrough && mVelY>0) mVelY = 0;
+	if(!getBlock(mPosX+BLOCK, mPosY+BLOCK).passThrough|!getBlock(mPosX, mPosY+BLOCK).passThrough && mVelY>0){
+	   	mVelY = 0;
+		//if(oldVelX!=0) sound.play(BUMPFX);
+	}
 //U
-	if(!getBlock(mPosX, mPosY-8).passThrough && mVelY<0) mVelY = 0;
+	if(!getBlock(mPosX, mPosY-8).passThrough && mVelY<0){
+	   	mVelY = 0;
+		sound.play(BUMPFX);
+	}
 }
 
 Player::~Player(){}

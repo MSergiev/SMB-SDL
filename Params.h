@@ -1,7 +1,26 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
-#define WIDTH 800
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <pugixml.hpp>
+
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::string;
+using std::fstream;
+
+#include "Texture.h"
+#include "Sound.h"
+#include "Text.h"
+
+#define WIDTH 600
 #define HEIGHT 600
 #define LHEIGHT 14
 #define LLENGTH 250
@@ -15,8 +34,6 @@
 #define MLENGTH LLENGTH
 #define MHEIGHT LHEIGHT+4
 #define GRAVITY 9.8
-
-#include <vector>
 
 enum Item
 { 
@@ -56,4 +73,8 @@ struct Block
 };
 
 typedef std::vector< std::vector<Block> > Layout;
+
+#include "Level.h"
+#include "Player.h"
+
 #endif

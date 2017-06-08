@@ -1,8 +1,9 @@
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <SDL2/SDL.h>
 #include "Texture.h"
+#include "Sound.h"
 #include "Params.h"
 
 class Player
@@ -29,6 +30,7 @@ public:
 	int mVelX, mVelY;
 	int oldVelX;
 	SDL_RendererFlip flip;
+	Sound sound;
 };
 
 #endif
