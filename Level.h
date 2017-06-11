@@ -9,8 +9,8 @@ class Level
 public:
 	int length, palette, flagpole;
 	Layout layout;
-	Level(Texture& mTileset);
-	void render(int scroll=0);
+	Level();
+	void render(int scroll);
 	void blockCollision(int posX, int posY);
 	void toTXT();
 	~Level();
@@ -18,7 +18,6 @@ public:
 private:
 	int world, level, bgRepeat;
 	Uint32 animationTimer;
-	Texture& mTileset;
 	SDL_Color bgColor; 
 	void generate();
 	void createFlagpole();

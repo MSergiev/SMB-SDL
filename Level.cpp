@@ -1,15 +1,10 @@
 #include "Level.h"
 
-Level::Level(Texture& mTileset)
-	:mTileset(mTileset)
-{
+Level::Level(){
 	animationTimer = SDL_GetTicks();
 	bgColor = {0, 0, 0, 0};
 	for (int i = 0; i < MHEIGHT; ++i)
 	   layout.push_back(std::vector<Block>(MLENGTH, Block()));	
-
-	//for(int i = 0; i < LLENGTH; i++)
-	//layout[10][i] = Block(true, false, 0, 0, NOTHING, true, false);
 	generate();
 }
 
@@ -169,15 +164,13 @@ void Level::generate()
 			createFlagpole();
 			createCastle(5);
 	}
-	render();
-
 }
 
 void Level::render(int scroll)
 {
 	bool animate = (SDL_GetTicks()-animationTimer >= 500);
-	SDL_SetRenderDrawColor(mTileset.mRenderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-	SDL_RenderClear(mTileset.mRenderer);
+	SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+	//SDL_RenderClear(mTileset.mRenderer);
 		for(int i = 0; i < MHEIGHT; ++i){
 			for(int j = 0; j < MLENGTH; ++j){
 				if(layout[i][j].exists){
@@ -189,7 +182,7 @@ void Level::render(int scroll)
 						animationTimer = SDL_GetTicks();	
 					}
 					SDL_Rect tmp = {layout[i][j].texX*16,(layout[i][j].texY+palette*2)*16, 16, 16};
-					this->mTileset.render((j*16)-scroll, ZERO-(LHEIGHT-i)*16, &tmp);
+					tileset->render((j*16)-scroll, ZERO-(LHEIGHT-i)*16, &tmp);
 				}
 			}
 		}

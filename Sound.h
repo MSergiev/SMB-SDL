@@ -26,16 +26,18 @@ class Sound
 {
 public:
 	Sound();
-	bool load();
-	void free();
-	void play(SFX sound);
-	void music(Music music);
+	static bool load();
+	static void pause();
+	static bool playing();
+	static void free();
+	static void play(SFX sound);
+	static void music(Music music);
 	~Sound();
 
 private:
-	Uint32 timer;
-	Mix_Chunk* sfx[25];
-	Mix_Music* bgm[10];
+	static Uint32 timer;
+	static Mix_Chunk* sfx[25];
+	static Mix_Music* bgm[10];
 };
 
 

@@ -30,10 +30,10 @@ using std::fstream;
 #define ZERO HEIGHT/2-(LHEIGHT*BLOCK)/3-10
 #define FPS 60
 #define TICKS_PER_FRAME 1000/FPS
-#define OFFSET BLOCK*2
+#define OFFSET BLOCK+4
 #define MLENGTH LLENGTH
 #define MHEIGHT LHEIGHT+4
-#define GRAVITY 9.8
+#define GRAVITY 8
 
 enum Item
 { 
@@ -76,5 +76,13 @@ typedef std::vector< std::vector<Block> > Layout;
 
 #include "Level.h"
 #include "Player.h"
+
+extern SDL_Renderer* renderer;
+extern Texture* tileset;
+extern Texture* playerSprites;
+extern Texture* title;
+extern bool* start;
+extern bool* death;
+extern int* lives;
 
 #endif

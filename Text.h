@@ -1,12 +1,13 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "Params.h"
 #include <SDL2/SDL_ttf.h>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
 #include "Texture.h"
+#include "Sound.h"
+#include "Params.h"
 using std::stringstream;
 using std::setw;
 using std::setfill;
@@ -16,18 +17,21 @@ class Text
 {
 public:
 	int score, coins, mainW, subW, time;
-	bool showHUD, showMenu, showBegin;
-	Text(SDL_Renderer* mRenderer, Texture* mTileset);
+	int oldLives;
+	int mLives;
+	bool mStart, restart;
+	bool showTitle, showLives;
+	
+	Text();
 	void drawHUD();
-	void drawMenu();
+	void drawStatus();
+	void drawTitle();
 	void drawBegin();
 	~Text();
 private:
-	SDL_Renderer* mRenderer;
-	Uint32 timer;
-	Texture* mTileset;
+	Uint32 timer, restartTimer;
 	TTF_Font* mFont;
-	Texture tScore;
+	Texture tText;
 };
 
 #endif

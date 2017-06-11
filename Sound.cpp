@@ -1,9 +1,13 @@
 #include "Sound.h"
 
+Uint32 Sound::timer;
+Mix_Chunk* Sound::sfx[];
+Mix_Music* Sound::bgm[];
+
 Sound::Sound() 
 {
-	if(!load())
-		cerr << "Sound loading failed" << endl;
+	//if(!load())
+	//	cerr << "Sound loading failed" << endl;
 }
 
 void Sound::free() 
@@ -17,7 +21,7 @@ void Sound::free()
 		Mix_FreeMusic(bgm[i]);
 		bgm[i] = NULL;
 	}
-	
+
 	Mix_Quit();	
 }
 
@@ -90,7 +94,14 @@ void Sound::play(SFX sound)
 	}
 }
 
+bool Sound::playing(){
+	return Mix_PlayingMusic();
+}
+
 void Sound::music(Music music){
+	if(Mix_PlayingMusic()){
+		Mix_ResumeMusic();
+	}else {
 	switch(music){
 		case OVERWORLD:
 			Mix_PlayMusic(bgm[0], -1);
@@ -105,11 +116,16 @@ void Sound::music(Music music){
 			Mix_PlayMusic(bgm[3], -1);
 			break;
 	}
+	}
+}
+
+void Sound::pause(){
+	Mix_PauseMusic();
 }
 
 Sound::~Sound() 
 {
-	free();
+	//free();
 }
 
 bool Sound::load() 
@@ -167,4 +183,3 @@ bool Sound::load()
 	}
 	return success;
 }
-

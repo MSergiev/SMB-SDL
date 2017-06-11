@@ -9,24 +9,47 @@ inline int getScroll();
 
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
+
+SDL_Renderer* renderer;
+Texture* tileset;
+Texture* playerSprites;
+Texture* title;
+bool* start;
+bool* death;
+int* lives;
+
 Texture gTileset(gRenderer);
 Texture gPlayerSprites(gRenderer);
-Level level(gTileset);
-Player player(gPlayerSprites);
+Texture gTitle(gRenderer);
+Level level;
+Player player;
 int completion;
-bool quit = false;
+bool quit = 0;
+bool  *showTitle, *showLives;
+Uint32 restartTimer;
+
 
 int main(int argc, char* argv[]){
 	if(!init()) cerr << "Init failed" << endl;
 	else {
+		renderer = gRenderer;
+		Text hud;
 		int countedFrames = 0;
 		Uint32 timer;
 		gTileset = Texture(gRenderer);
 		gPlayerSprites = Texture(gRenderer);
-		//level.toTXT();
+		gTitle = Texture(gRenderer);
+		showTitle = &hud.showTitle;
+		showLives = &hud.showLives;
 		player.layout = &level.layout;
-		Text hud(gRenderer, &gTileset);
-		hud.showHUD = 1;
+
+		tileset = &gTileset;
+		playerSprites = &gPlayerSprites;
+		title = &gTitle;
+		start = &hud.mStart;
+		death = &player.mDeath;
+		lives = &hud.mLives;
+
 		if(!loadMedia()) cerr << "Tileset loading failed" << endl;
 		else{
 			SDL_RenderSetScale(gRenderer, 2.5, 2.5);
@@ -35,9 +58,8 @@ int main(int argc, char* argv[]){
 				timer = SDL_GetTicks();
 				eventHandler(e);
 				player.eventHandler();
-				float avg = countedFrames/((SDL_GetTicks()-timer)/1000.f);
-				if(avg>2000000) avg = 0;
-				level.render(getScroll());
+				SDL_RenderClear(gRenderer);
+				level.render(player.mPosX);
 				player.render();
 				hud.drawHUD();
 				SDL_RenderPresent(gRenderer);
@@ -49,14 +71,6 @@ int main(int argc, char* argv[]){
 	}
 	close();
 	return 0;
-}
-
-int getScroll(){
-	//if(player.mPosX>64&&player.mPosX<level.flagpole*16-128){ player.scroll=false; return player.mPosX;}
-	player.scroll=true;
-	//if(player.mPosX<=64) return 64;
-	//return (level.flagpole*16-128);
-	return player.mPosX;
 }
 
 bool init(){
@@ -99,6 +113,14 @@ bool loadMedia()
 		cerr << "Spritesheet error" << endl;
 		success = false;
 	}
+	if(!gTitle.loadFromFile("GFX/title.png")){
+		cerr << "Title error" << endl;
+		success = false;
+	}
+	if(!Sound::load()){
+		cerr << "Sound error" << endl;
+		success = false;
+	}
 	return success;
 }
 
@@ -110,6 +132,12 @@ void eventHandler(SDL_Event& e)
 		switch(e.key.keysym.sym){
 			case SDLK_ESCAPE:
 				quit = true;
+				break;
+			case SDLK_RETURN:
+				*showTitle = 0;
+				break;
+			case SDLK_t:
+				level.toTXT();
 				break;
 			}
 		}

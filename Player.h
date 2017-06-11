@@ -1,4 +1,3 @@
-
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -9,28 +8,26 @@
 class Player
 {
 public:
-	Player(Texture& mSpriteSheet);
+	Player();
 	void eventHandler();
 	void render();
-	bool isFalling();
 	Block& getBlock(int x, int y);
-	//void calculateGround();
-	void blockCollide();
+	void blockCollide(int x, int y);
 	~Player();
 
-	Uint32 accelTimer, jumpTimer;
+	Uint32 accelTimer, jumpTimer, restartTimer;
 	Layout* layout;
-	bool jumped;
-	bool scroll;
+	bool up, down, left, right;
+	bool oUp, oDown, oLeft, oRight;
+	bool scroll, accelerate, jumped;
 	bool mushroom, flower, star;
 	bool run;
+	bool restart, mDeath;
 	int starCounter;
-	Texture& mSpriteSheet;
 	int mPosX, mPosY;
 	int mVelX, mVelY;
 	int oldVelX;
 	SDL_RendererFlip flip;
-	Sound sound;
 };
 
 #endif
